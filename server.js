@@ -1,4 +1,7 @@
+var JWT_STRING = /^[A-Za-z0-9_=\-\.]*$/ // roughly
+var async = require('async')
 var config = require('./lib/config')
+var JWKSet = require('./lib/jwkset')
 var log = require('./lib/log')
 var subscriptions = require('./lib/subscriptions')
 var notifier = require('./lib/notifier')
@@ -6,6 +9,9 @@ var hapi = require('hapi')
 var joi = require('joi')
 
 var db = require('./lib/db/' + config.db.driver)
+
+var keys = require('./lib/keys')(config)
+var jw = new JWKSet(config.jwk.trustedJKUs)
 
 var server = new hapi.Server()
 server.connection({
@@ -32,32 +38,55 @@ server.register(
 
 server.route([
   {
+    method: 'GET',
+    path: '/.well-known/public-keys',
+    handler: function (req, reply) {
+      reply(
+        {
+          keys: [ keys.public ]
+        }
+      )
+    }
+  },
+  {
     method: 'POST',
     path: '/v0/publish',
     config: {
       validate: {
         payload: {
-          events: joi.array().max(1000).includes(joi.string()).required()
+          events: joi.array()
+            .max(1000)
+            .items(joi.string().regex(JWT_STRING))
+            .required()
         }
       }
     },
     handler: function (req, reply) {
       var events = req.payload.events
       var notifyUrls = {}
-      for (var i = 0; i < events.length; i++) {
-        try {
-          var event = JSON.parse(events[i])
-          db.append(event)
-          subscriptions.whoToNotify(event).forEach(
-            function (url) {
-              notifyUrls[url] = true
+      async.forEach(
+        events,
+        function (str, next) {
+          jw.verify(
+            str,
+            function (err, jwt) {
+              if (err) { return next(err) }
+              db.append(jwt)
+              subscriptions.whoToNotify(event).forEach(
+                function (url) {
+                  notifyUrls[url] = true
+                }
+              )
+              next()
             }
           )
+        },
+        function (err) {
+          if (err) { return reply(err) }
+          notifier.ping(Object.keys(notifyUrls))
+          reply({})
         }
-        catch (e) {}
-      }
-      notifier.ping(Object.keys(notifyUrls))
-      reply({})
+      )
     }
   },
   {

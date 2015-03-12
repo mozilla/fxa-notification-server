@@ -5,14 +5,18 @@
   "author": "Mozilla (https://mozilla.org/)",
   "bugs": "https://github.com/mozilla/fxa-notification-server/issues",
   "dependencies": {
+    "async": "0.9.0",
     "convict": "0.6.1",
-    "hapi": "8.2.0",
+    "hapi": "8.3.1",
     "hapi-fxa-oauth": "2.0.1",
-    "joi": "5.1.0",
-    "mozlog": "1.0.2"
+    "joi": "6.0.8",
+    "jws": "2.0.0",
+    "mozlog": "1.0.3",
+    "pem-jwk": "1.1.1",
+    "request": "2.53.0"
   },
   "devDependencies": {
-    "lab": "5.2.1"
+    "lab": "5.5.0"
   },
   "directories": {
     "doc": "docs"
@@ -24,6 +28,6 @@
   "license": "MPL 2.0",
   "repository": "mozilla/fxa-notification-server",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "lab -f -c test"
   }
 }
