@@ -19,6 +19,10 @@
     "uuid": "2.0.1"
   },
   "devDependencies": {
+    "eslint-config-fxa": "1.4.0",
+    "grunt": "0.4.5",
+    "grunt-copyright": "0.2.0",
+    "grunt-eslint": "15.0.0",
     "istanbul": "0.3.10",
     "tap": "0.7.1"
   },

@@ -1,0 +1,4 @@
+extends: fxa/server
+
+rules:
+  complexity: 0

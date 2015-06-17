@@ -29,7 +29,6 @@
  */
 
 var tap = require('tap')
-var P = require('../../lib/promise')
 
 module.exports = function (name, fn) {
   tap.test(

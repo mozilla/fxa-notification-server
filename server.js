@@ -1,3 +1,7 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
 var JWT_STRING = /^[A-Za-z0-9_=\-\.]*$/ // roughly
 var boom = require('boom')
 var config = require('./lib/config')
@@ -404,5 +408,3 @@ if (require.main === module) {
 else {
   module.exports = Server
 }
-
-
